@@ -1,12 +1,58 @@
 ---
 title: "Census Tracts"
+author: "Ayush Chandra"
+execute: 
+    echo: FALSE
+    warning: FALSE
+    message: FALSE
+    
 ---
-
-This is a Quarto website. NYC
-
-To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
 
 
 ```{r}
+#| echo: false
+library(tidyverse)
+library(dplyr)
+library(readr)
+```
 
+
+```{r}
+#| message: false
+#| warning: false
+library(tidyverse) 
+data_raw <- read_csv("data/nyc_tracts.csv",
+                     col_types = cols(
+                       tract = col_character(),
+                       race = col_character(),
+                       med_income = col_character() 
+                     ))
+
+nyc_data <- data_raw %>%
+  separate(tract, into = c("tract_id", "county_state"), sep = "; ", extra = "merge") %>%
+  separate(county_state, into = c("county", "state"), sep = "; ", extra = "merge") %>%
+  mutate(
+    med_income = as.numeric(na_if(med_income, "NA")), # Now med_income is character, so na_if works
+    county = str_remove(county, " County") # Clean up county names
+  ) %>%
+  filter(!is.na(med_income)) # Remove rows where median income is NA
+# Create the graphic
+ggplot(nyc_data, aes(x = county, y = med_income, fill = race)) +
+  geom_boxplot(outlier.shape = NA) + # Use box plots to show distribution, hide outliers for cleaner look
+  geom_jitter(aes(color = race), width = 0.2, alpha = 0.6, size = 1.5) + # Add jittered points to show individual data points
+  facet_wrap(~ race, scales = "free_y") + # Separate plots by race, with free y-scales for better comparison
+  labs(
+    title = "Median Income Distribution by Race and County in NYC Census Tracts",
+    x = "County",
+    y = "Median Income ($)",
+    fill = "Race",
+    color = "Race"
+  ) +
+  scale_y_continuous(labels = scales::dollar) + # Format y-axis as currency
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1), # Rotate x-axis labels for readability
+    plot.title = element_text(hjust = 0.5, face = "bold"), # Center and bold the title
+    strip.text = element_text(face = "bold") # Bold facet titles
+  )
 ```
