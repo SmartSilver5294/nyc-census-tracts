@@ -5,3 +5,8 @@ title: "Census Tracts"
 This is a Quarto website. NYC
 
 To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
+
+
+```{r}
+
+```
