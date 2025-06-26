@@ -1,5 +1,5 @@
 ---
-title: "Census Tracts"
+title: "New York City Income Based On Race"
 author: "Ayush Chandra"
 execute: 
     echo: FALSE
